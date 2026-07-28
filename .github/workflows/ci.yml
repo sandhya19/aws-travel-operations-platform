@@ -1,0 +1,40 @@
+name: Continuous Integration
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
+
+permissions:
+  contents: read
+
+jobs:
+  python-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Poetry
+        run: pipx install poetry==1.8.5
+      - name: Install dependencies
+        run: poetry install --with dev
+      - name: Lint
+        run: poetry run ruff check .
+      - name: Format check
+        run: poetry run black --check .
+      - name: Static type check
+        run: poetry run mypy src tests
+      - name: Test
+        run: poetry run pytest
+
+  terraform-format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.9.8"
+      - name: Check Terraform formatting
+        run: terraform fmt -check -recursive terraform
