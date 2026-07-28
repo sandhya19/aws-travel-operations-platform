@@ -10,7 +10,7 @@ and development environment network composition. No application code was added.
 
 ## Current milestone
 
-Milestone 3 is complete. Do not start Milestone 4 without an explicit request.
+Milestone 4 is complete. Do not start Milestone 5 without an explicit request.
 
 ## Next authorized work
 

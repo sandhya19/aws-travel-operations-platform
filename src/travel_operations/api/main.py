@@ -1,6 +1,7 @@
 """FastAPI Lambda entry point for travel-request metadata."""
 import logging
 import os
+from collections.abc import Generator
 from datetime import date
 from uuid import UUID
 
@@ -11,11 +12,12 @@ from mangum import Mangum
 from pydantic import BaseModel, ConfigDict, Field
 
 from travel_operations.auth import AuthenticatedUser, require_user
+from travel_operations.database import session_scope
+from travel_operations.repositories.travel_requests import TravelRequestRepository
 from travel_operations.services.travel_requests import TravelRequestNotFound, TravelRequestService
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(message)s")
 logger = logging.getLogger(__name__)
-service = TravelRequestService()
 
 
 class TravelRequestCreate(BaseModel):
@@ -41,6 +43,12 @@ class TravelRequestResponse(BaseModel):
 app = FastAPI(title="Travel Operations API", version="0.1.0", openapi_url="/openapi.json")
 
 
+def get_service() -> Generator[TravelRequestService, None, None]:
+    """Create a request-scoped service with commit/rollback semantics."""
+    for session in session_scope():
+        yield TravelRequestService(TravelRequestRepository(session))
+
+
 @app.exception_handler(TravelRequestNotFound)
 async def travel_request_not_found(_: Request, error: TravelRequestNotFound) -> JSONResponse:
     return JSONResponse(status_code=404, content={"detail": str(error)})
@@ -53,7 +61,7 @@ async def validation_error(_: Request, error: RequestValidationError) -> JSONRes
 
 @app.post("/travel-request", response_model=TravelRequestResponse, status_code=status.HTTP_201_CREATED)
 def create_travel_request(
-    payload: TravelRequestCreate, user: AuthenticatedUser = Depends(require_user)
+    payload: TravelRequestCreate, user: AuthenticatedUser = Depends(require_user), service: TravelRequestService = Depends(get_service)
 ) -> TravelRequestResponse:
     """Create a metadata-only travel request for the authenticated employee."""
     if payload.return_date < payload.departure_date:
@@ -64,7 +72,7 @@ def create_travel_request(
 
 
 @app.get("/travel-request/{request_id}", response_model=TravelRequestResponse)
-def get_travel_request(request_id: UUID, user: AuthenticatedUser = Depends(require_user)) -> TravelRequestResponse:
+def get_travel_request(request_id: UUID, user: AuthenticatedUser = Depends(require_user), service: TravelRequestService = Depends(get_service)) -> TravelRequestResponse:
     """Return a request only when it belongs to the authenticated employee."""
     request = service.get(request_id, user.subject)
     logger.info("travel_request_retrieved id=%s requester_id=%s", request.id, user.subject)

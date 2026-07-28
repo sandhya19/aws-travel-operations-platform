@@ -6,7 +6,7 @@
 | 1 | Infrastructure (Terraform) | Complete |
 | 2 | API and authentication | Complete |
 | 3 | Event-driven platform | Complete |
-| 4 | CockroachDB | Not started |
+| 4 | CockroachDB | Complete |
 | 5 | Knowledge ingestion | Not started |
 | 6 | RAG engine | Not started |
 | 7 | AI agents | Not started |

@@ -1,30 +1,22 @@
-"""Repository boundary for travel-request metadata."""
-from dataclasses import dataclass
+"""CockroachDB repository for travel-request metadata."""
 from datetime import date
-from uuid import UUID, uuid4
+from uuid import UUID
 
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
-@dataclass(frozen=True)
-class TravelRequest:
-    id: UUID
-    requester_id: str
-    destination_country: str
-    departure_date: date
-    return_date: date
-    purpose: str
-    status: str = "SUBMITTED"
+from travel_operations.models import TravelRequestModel
 
 
 class TravelRequestRepository:
-    """In-memory metadata repository; replace with CockroachDB in Milestone 4."""
+    def __init__(self, session: Session) -> None:
+        self._session = session
 
-    def __init__(self) -> None:
-        self._records: dict[UUID, TravelRequest] = {}
-
-    def add(self, requester_id: str, destination_country: str, departure_date: date, return_date: date, purpose: str) -> TravelRequest:
-        request = TravelRequest(uuid4(), requester_id, destination_country, departure_date, return_date, purpose)
-        self._records[request.id] = request
+    def add(self, requester_id: str, destination_country: str, departure_date: date, return_date: date, purpose: str) -> TravelRequestModel:
+        request = TravelRequestModel(requester_id=requester_id, destination_country=destination_country, departure_date=departure_date, return_date=return_date, purpose=purpose)
+        self._session.add(request)
+        self._session.flush()
         return request
 
-    def get(self, request_id: UUID) -> TravelRequest | None:
-        return self._records.get(request_id)
+    def get(self, request_id: UUID) -> TravelRequestModel | None:
+        return self._session.scalar(select(TravelRequestModel).where(TravelRequestModel.id == request_id))
