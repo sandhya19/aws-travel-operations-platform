@@ -17,4 +17,9 @@ resource "aws_cloudwatch_event_target" "this" {
   event_bus_name = aws_cloudwatch_event_bus.this.name
   arn            = each.value.target_arn
   target_id      = each.key
+  retry_policy {
+    maximum_event_age_in_seconds = each.value.maximum_event_age_in_seconds
+    maximum_retry_attempts       = each.value.maximum_retry_attempts
+  }
+  dead_letter_config { arn = each.value.dlq_arn }
 }
