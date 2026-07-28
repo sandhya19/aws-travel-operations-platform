@@ -4,15 +4,14 @@
 
 ## Completed
 
-Milestone 0 initialized the production-oriented monorepo scaffold: Poetry/Python
-configuration, code-quality tooling, pre-commit, CI, Terraform module/environment
-layout, and documentation structure.
+Milestone 0 initialized the production-oriented monorepo scaffold. Milestone 1 added
+reusable Terraform modules for the AWS platform boundaries, documentation, examples,
+and development environment network composition. No application code was added.
 
 ## Current milestone
 
-Milestone 0 is complete. Do not start Milestone 1 without an explicit request.
+Milestone 2 is complete. Do not start Milestone 3 without an explicit request.
 
 ## Next authorized work
 
-Milestone 1: add Terraform backend, provider configuration, and first reusable
-infrastructure modules after architecture decisions are recorded.
+Milestone 3: add domain event publishing and asynchronous workflow integration.

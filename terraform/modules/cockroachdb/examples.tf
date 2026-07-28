@@ -1,0 +1,1 @@
+# Example: module "cockroach" { source = "../../modules/cockroachdb" name = "travel-dev" vpc_id = module.network.vpc_id allowed_egress_cidrs = ["203.0.113.0/24"] connection_secret_arn = module.db_secret.secret_arn }

@@ -29,5 +29,6 @@ company policy and external travel knowledge, while maintaining auditability.
 5. Terraform provisions all infrastructure.
 6. Security and observability are designed in, not bolted on.
 
-Detailed C4, API, data-flow, and event-flow diagrams will be added with the relevant
-implementation milestones.
+The Terraform module library now captures the infrastructure boundaries. Application
+routes, event consumers, and workflow states remain deferred until their owning
+milestones; no application code is provisioned by Terraform.

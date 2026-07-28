@@ -3,8 +3,8 @@
 | Milestone | Scope | Status |
 | --- | --- | --- |
 | 0 | Repository foundation and engineering scaffolding | Complete |
-| 1 | Infrastructure (Terraform) | Not started |
-| 2 | API and authentication | Not started |
+| 1 | Infrastructure (Terraform) | Complete |
+| 2 | API and authentication | Complete |
 | 3 | Event-driven platform | Not started |
 | 4 | CockroachDB | Not started |
 | 5 | Knowledge ingestion | Not started |

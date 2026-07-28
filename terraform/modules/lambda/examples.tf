@@ -1,0 +1,1 @@
+# Example: module "validator" { source = "../../modules/lambda" function_name = "travel-dev-validator" description = "Validates requests" role_arn = module.lambda_role.role_arn handler = "handler.main" package_file = "artifacts/validator.zip" log_group_name = module.logs.log_group_name }

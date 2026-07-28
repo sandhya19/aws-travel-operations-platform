@@ -1,0 +1,1 @@
+# Example: module "workflow" { source = "../../modules/step_functions" name = "travel-dev" role_arn = module.workflow_role.role_arn definition = jsonencode({ StartAt = "Done", States = { Done = { Type = "Succeed" } } }) log_group_arn = module.workflow_logs.log_group_arn }

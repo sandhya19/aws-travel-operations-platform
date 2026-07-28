@@ -1,6 +1,6 @@
 # Planned Terraform modules
 
-The following module boundaries are reserved: `api_gateway`, `bedrock`, `cockroachdb`,
-`eventbridge`, `iam`, `kms`, `lambda`, `monitoring`, `network`, `s3`, `sns`, `sqs`, and
-`step_functions`. Each module will expose explicit variables and outputs, use
-least-privilege IAM, and contain no environment-specific values.
+The module library includes `api_gateway`, `bedrock`, `cockroachdb`, `eventbridge`,
+`iam`, `kms`, `lambda`, `monitoring`, `network`, `s3`, `secrets_manager`, `sns`, `sqs`,
+`step_functions`, and `xray`. Each module exposes variables and outputs, uses no
+environment-specific values, and includes a README and example.
