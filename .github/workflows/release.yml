@@ -1,7 +1,8 @@
 name: Release
+# Push triggers are intentionally disabled until the release pipeline is ready.
+# Run this workflow manually from GitHub Actions.
 on:
-  push:
-    branches: [main, master]
+  workflow_dispatch:
 permissions:
   contents: write
   packages: write
