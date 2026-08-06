@@ -1,14 +1,11 @@
-import os
-
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from travel_operations import models  # noqa: F401
-from travel_operations.database import Base
+from travel_operations.database import Base, load_database_url
 
 config = context.config
-if database_url := os.getenv("DATABASE_URL"):
-    config.set_main_option("sqlalchemy.url", database_url)
+config.set_main_option("sqlalchemy.url", load_database_url())
 target_metadata = Base.metadata
 
 if context.is_offline_mode():
