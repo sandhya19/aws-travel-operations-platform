@@ -1,0 +1,11 @@
+sequenceDiagram
+  participant E as Employee
+  participant A as API/Lambda
+  participant W as Step Functions
+  participant H as Human Approver
+  E->>A: Submit request
+  A->>W: Start workflow
+  W->>W: Validate, retrieve, assess
+  W->>H: Approval packet
+  H-->>W: Approve or reject
+  W-->>A: Completion status

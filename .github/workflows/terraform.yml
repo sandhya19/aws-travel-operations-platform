@@ -1,0 +1,29 @@
+name: Terraform
+on:
+  pull_request:
+    paths: ["terraform/**"]
+  push:
+    branches: [main, master]
+    paths: ["terraform/**"]
+permissions:
+  contents: read
+  pull-requests: write
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=terraform/environments/dev init -backend=false
+      - run: terraform -chdir=terraform/environments/dev validate
+      - run: terraform -chdir=terraform/environments/dev plan -input=false -out=tfplan
+  apply:
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    needs: plan
+    environment: production
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform -chdir=terraform/environments/prod init
+      - run: terraform -chdir=terraform/environments/prod apply -auto-approve

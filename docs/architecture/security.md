@@ -1,0 +1,14 @@
+# Production security controls
+
+Terraform IAM roles are service-scoped and must use least-privilege inline policies.
+KMS encrypts queues, topics, logs, storage, and Secrets Manager entries; credentials are
+provided only through Secrets Manager. API schemas validate inputs, prompt-bound text is
+screened for instruction override attempts, and audit logs mask common email/card PII.
+Every request should carry a correlation ID for audit and incident investigation.
+
+## Security dashboard
+
+The monitoring module provisions a CloudWatch security dashboard for Lambda errors and
+API Gateway 4XX/5XX signals. Production deployments must add alarms for authentication
+failures, Secrets Manager access failures, KMS failures, DLQ depth, and anomalous IAM
+denials; alert routing is environment-owned.

@@ -8,9 +8,9 @@
 | 3 | Event-driven platform | Complete |
 | 4 | CockroachDB | Complete |
 | 5 | Knowledge ingestion | Not started |
-| 6 | RAG engine | Not started |
+| 6 | RAG engine | Complete |
 | 7 | AI agents | Not started |
-| 8 | Travel workflow | Not started |
+| 8 | Travel workflow | Complete |
 | 9 | Evaluation framework | Not started |
 | 10 | Observability and security | Not started |
 | 11 | CI/CD and production hardening | Not started |

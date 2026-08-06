@@ -1,0 +1,14 @@
+{
+  "Comment": "Human-governed travel request workflow",
+  "StartAt": "Validate",
+  "States": {
+    "Validate": {"Type":"Task","Resource":"${ValidateLambdaArn}","Next":"RetrieveKnowledge","Retry":[{"ErrorEquals":["States.ALL"],"MaxAttempts":3}]},
+    "RetrieveKnowledge": {"Type":"Task","Resource":"${RetrieveLambdaArn}","Next":"AssessPolicy"},
+    "AssessPolicy": {"Type":"Task","Resource":"${PolicyLambdaArn}","Next":"AssessRisk"},
+    "AssessRisk": {"Type":"Task","Resource":"${RiskLambdaArn}","Next":"CalculateInsurance"},
+    "CalculateInsurance": {"Type":"Task","Resource":"${InsuranceLambdaArn}","Next":"GenerateRecommendation"},
+    "GenerateRecommendation": {"Type":"Task","Resource":"${RecommendationLambdaArn}","Next":"HumanApproval"},
+    "HumanApproval": {"Type":"Task","Resource":"${ApprovalLambdaArn}","Next":"Complete"},
+    "Complete": {"Type":"Succeed"}
+  }
+}

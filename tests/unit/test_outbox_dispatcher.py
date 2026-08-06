@@ -1,0 +1,68 @@
+"""Retry contracts for durable workflow outbox publication."""
+
+import json
+from types import SimpleNamespace
+from uuid import uuid4
+
+from travel_operations import outbox_dispatcher
+
+
+class FakeSession:
+    def __enter__(self) -> "FakeSession":
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        return None
+
+    def commit(self) -> None:
+        return None
+
+
+class FakeService:
+    def __init__(self, event: object) -> None:
+        self._event = event
+        self.published: list[object] = []
+        self.failures: list[tuple[object, str]] = []
+
+    def pending_outbox_events(self) -> list[object]:
+        return [self._event]
+
+    def mark_outbox_event_published(self, event_id: object) -> None:
+        self.published.append(event_id)
+
+    def record_outbox_failure(self, event_id: object, error: str) -> None:
+        self.failures.append((event_id, error))
+
+
+def test_dispatcher_marks_successful_event_published(monkeypatch: object) -> None:
+    event = SimpleNamespace(
+        id=uuid4(),
+        travel_request_id=uuid4(),
+        payload=json.dumps({"requester_id": "employee"}),
+    )
+    service = FakeService(event)
+    monkeypatch.setattr(outbox_dispatcher, "SessionFactory", lambda: FakeSession())
+    monkeypatch.setattr(outbox_dispatcher, "TravelRequestService", lambda _: service)
+    monkeypatch.setattr(outbox_dispatcher, "publish_travel_request_created", lambda *_: None)
+
+    assert outbox_dispatcher.handler({}, object()) == {"published": 1, "failed": 0}
+    assert service.published == [event.id]
+
+
+def test_dispatcher_leaves_failed_event_pending_for_retry(monkeypatch: object) -> None:
+    event = SimpleNamespace(
+        id=uuid4(),
+        travel_request_id=uuid4(),
+        payload=json.dumps({"requester_id": "employee"}),
+    )
+    service = FakeService(event)
+    monkeypatch.setattr(outbox_dispatcher, "SessionFactory", lambda: FakeSession())
+    monkeypatch.setattr(outbox_dispatcher, "TravelRequestService", lambda _: service)
+    monkeypatch.setattr(
+        outbox_dispatcher,
+        "publish_travel_request_created",
+        lambda *_: (_ for _ in ()).throw(RuntimeError("EventBridge unavailable")),
+    )
+
+    assert outbox_dispatcher.handler({}, object()) == {"published": 0, "failed": 1}
+    assert service.failures == [(event.id, "EventBridge unavailable")]

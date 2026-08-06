@@ -10,6 +10,12 @@ variable "memory_size" { default = 512 }
 variable "kms_key_arn" { default = null }
 variable "subnet_ids" { default = [] }
 variable "security_group_ids" { default = [] }
-variable "environment_variables" { default = {} }
+variable "environment_variables" {
+  type    = map(string)
+  default = {}
+}
 variable "log_group_name" { type = string }
-variable "tags" { default = {} }
+variable "tags" {
+  type    = map(string)
+  default = {}
+}
