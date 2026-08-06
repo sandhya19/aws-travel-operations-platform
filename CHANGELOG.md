@@ -1,3 +1,14 @@
+# 1.0.0 (2026-08-06)
+
+
+### Features
+
+* add CockroachDB persistence ([9b6ab05](https://github.com/sandhya19/aws-travel-operations-platform/commit/9b6ab051e3fced3a7bb59410a0cb3bd246119fa9))
+* add travel lifecycle events ([5abbb0d](https://github.com/sandhya19/aws-travel-operations-platform/commit/5abbb0d600275d11be15c0afdeff7e9e7a72a959))
+* add travel workflow reliability and platform foundations ([ccea73d](https://github.com/sandhya19/aws-travel-operations-platform/commit/ccea73df79f7daf6f4048f745a7df84b71fbcfcf))
+* implement travel request API ([92bbdb1](https://github.com/sandhya19/aws-travel-operations-platform/commit/92bbdb1dcd436b37b0050620c8e0e24ae05f7804))
+* initialize repository ([c3affa6](https://github.com/sandhya19/aws-travel-operations-platform/commit/c3affa608d6a9766a478985f797045f72fb6a57a))
+
 # Changelog
 
 All notable changes are generated automatically from Conventional Commits by semantic-release.
