@@ -1,40 +1,63 @@
 # AI Travel Operations Platform
 
-An enterprise platform for accelerating travel-request operations with explainable,
-document-grounded AI recommendations. Human approvers retain all final decisions.
+[![CI](https://github.com/your-org/ai-travel-operations-platform/actions/workflows/ci.yml/badge.svg)](../../actions/workflows/ci.yml)
+[![Terraform](https://img.shields.io/badge/IaC-Terraform-7B42BC)](terraform/)
+[![Python](https://img.shields.io/badge/python-3.12-3776AB)](pyproject.toml)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-## Status
+An interview-ready reference platform for human-governed, AI-assisted corporate travel operations. It demonstrates serverless APIs, event-driven workflows, CockroachDB persistence, RAG foundations, security controls, evaluation, and production-oriented infrastructure.
 
-Milestone 0 establishes repository conventions and delivery tooling only. No runtime
-application, cloud resources, or AI workflow has been implemented.
+> AI recommends. Humans approve. Every material recommendation is intended to be explainable and source-grounded.
 
-## Technology direction
+## Why this project
 
-- Python 3.12 and Poetry for application services
-- AWS serverless and event-driven services, provisioned exclusively with Terraform
-- CockroachDB Serverless as the transactional data store
-- Amazon Bedrock and RAG for grounded recommendations
+- Clear domain boundaries: API, workflow, knowledge, policy/risk/insurance, and approval
+- Production practices: Terraform, least privilege, KMS/Secrets, audit logs, CI/CD
+- Explainable AI foundations: citations, prompt versions, grounding checks, evaluations
+- Practical interview discussion: trade-offs, ADRs, diagrams, runbooks, and tests
 
-## Repository layout
+## Architecture
 
-| Path | Purpose |
-| --- | --- |
-| `src/` | Future Python application packages |
-| `tests/` | Unit, integration, and contract test suites |
-| `terraform/` | Reusable Terraform modules and environment composition |
-| `docs/` | Architecture, ADRs, runbooks, prompts, and evaluation guidance |
-| `prompts/` | Versioned prompt source files (future milestones) |
-| `evaluations/` | Golden datasets and evaluation assets (future milestones) |
-| `knowledge_base/` | Controlled source documents for retrieval (future milestones) |
-| `.github/workflows/` | Continuous-integration workflows |
+```mermaid
+flowchart LR
+  Employee --> API[FastAPI on Lambda]
+  API --> DB[(CockroachDB)]
+  API --> EB[EventBridge]
+  EB --> SFN[Step Functions]
+  SFN --> RAG[Knowledge/RAG]
+  SFN --> Approval[Human approval]
+  RAG --> S3[S3 documents]
+  RAG --> DB
+```
 
-## Local setup
+See [architecture docs](docs/architecture/overview.md), [workflow diagram](docs/diagrams/travel-workflow.mmd), and [event flow](docs/architecture/event-flow.md).
 
-1. Install Python 3.12, Poetry 1.8+, Terraform 1.7+, and Git.
-2. Run `poetry install --with dev`.
-3. Run `poetry run pre-commit install`.
-4. Validate with `poetry run ruff check .`, `poetry run black --check .`,
-   `poetry run mypy src tests`, and `poetry run pytest`.
+## Quick start
 
-See [the roadmap](ROADMAP.md) and [architecture overview](docs/architecture/overview.md)
-for the planned delivery sequence.
+```bash
+poetry install --with dev
+poetry run pre-commit install
+poetry run pytest
+```
+
+Configure `JWT_SECRET` and `DATABASE_URL`; then run `poetry run alembic upgrade head`.
+
+The dev deployment exposes the same OpenAPI document through API Gateway. Its implemented
+vertical slice is: create request → EventBridge → Step Functions callback wait → authenticated
+approval → completion. AI decisioning is deliberately not on this path.
+
+## Guides
+
+- [Installation](docs/guides/installation.md)
+- [Deployment](docs/guides/deployment.md)
+- [Developer guide](docs/guides/development.md)
+- [Troubleshooting](docs/guides/troubleshooting.md)
+- [Demo data](docs/demo-data.md)
+
+## Project structure
+
+`src/` application code · `terraform/` reusable IaC · `docs/` architecture and operations · `prompts/` versioned prompts · `evaluations/` golden datasets · `tests/` quality checks.
+
+## Contributing
+
+Use Conventional Commits, run formatting/tests before opening a PR, and record consequential architecture choices as ADRs.

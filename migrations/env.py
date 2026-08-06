@@ -1,15 +1,28 @@
+import os
+
 from alembic import context
 from sqlalchemy import engine_from_config, pool
-from travel_operations.database import Base
+
 from travel_operations import models  # noqa: F401
+from travel_operations.database import Base
 
 config = context.config
+if database_url := os.getenv("DATABASE_URL"):
+    config.set_main_option("sqlalchemy.url", database_url)
 target_metadata = Base.metadata
 
 if context.is_offline_mode():
-    context.configure(url=config.get_main_option("sqlalchemy.url"), target_metadata=target_metadata, literal_binds=True)
-    with context.begin_transaction(): context.run_migrations()
+    context.configure(
+        url=config.get_main_option("sqlalchemy.url"),
+        target_metadata=target_metadata,
+        literal_binds=True,
+    )
+    with context.begin_transaction():
+        context.run_migrations()
 else:
-    with engine_from_config(config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool).connect() as connection:
+    with engine_from_config(
+        config.get_section(config.config_ini_section), prefix="sqlalchemy.", poolclass=pool.NullPool
+    ).connect() as connection:
         context.configure(connection=connection, target_metadata=target_metadata)
-        with context.begin_transaction(): context.run_migrations()
+        with context.begin_transaction():
+            context.run_migrations()

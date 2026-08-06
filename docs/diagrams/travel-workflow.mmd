@@ -1,0 +1,9 @@
+flowchart TD
+  Request[Travel request] --> Validation
+  Validation --> Retrieval[Knowledge retrieval]
+  Retrieval --> Policy
+  Policy --> Risk
+  Risk --> Insurance
+  Insurance --> Recommendation
+  Recommendation --> Approval[Human approval]
+  Approval --> Completion

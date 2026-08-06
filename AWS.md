@@ -8,5 +8,8 @@ Security requirements are least-privilege IAM, encrypted and TLS-protected data,
 Secrets Manager-backed credentials, input validation, prompt-injection protection, PII
 masking, audit logs, and human approval checkpoints.
 
+Application controls reject common prompt-injection instructions, validate API data, mask
+common PII before audit logging, and use correlation IDs for traceable audit events.
+
 Services will emit structured logs with correlation IDs, traces, metrics, and dashboards.
 Infrastructure implementation starts in Milestone 1.
