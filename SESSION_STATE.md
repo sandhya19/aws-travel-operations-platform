@@ -33,10 +33,9 @@ enables authenticated API calls; migrate it to Secrets Manager before production
 
 ## Current milestone
 
-IMP-012 is complete. IMP-003's deployed recovery path was exercised through an authorized
-approval: the API returned HTTP 202, CockroachDB recorded `APPROVED` and `COMPLETED`, and the
-idempotent Step Functions execution succeeded. A scripted authenticated request-submission
-test and demo evidence remain open.
+IMP-012 and IMP-003 are complete. The deployed dev demonstration runner creates an authenticated
+request, waits for approval, submits an authorized approval, and verifies `COMPLETED`; it was
+successfully exercised against the deployed API.
 
 ## Next authorized work
 

@@ -46,6 +46,9 @@ The dev deployment exposes the same OpenAPI document through API Gateway. Its im
 vertical slice is: create request → EventBridge → Step Functions callback wait → authenticated
 approval → completion. AI decisioning is deliberately not on this path.
 
+Run the reproducible deployed demonstration with `scripts/run_dev_workflow_demo.py`; see
+[Demo data](docs/demo-data.md) for the command.
+
 ## Guides
 
 - [Installation](docs/guides/installation.md)
