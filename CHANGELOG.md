@@ -17,6 +17,9 @@ All notable changes are generated automatically from Conventional Commits by sem
 
 ### Added
 
+- Moved the dev API JWT signing secret from Lambda environment configuration to a dedicated
+  KMS-encrypted Secrets Manager runtime secret.
+
 - Added the deployed EventBridge-to-Step-Functions approval vertical slice, SQS delivery DLQ,
   CockroachDB approval-task migration, and authenticated approval endpoint.
 

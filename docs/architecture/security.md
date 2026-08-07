@@ -6,6 +6,12 @@ provided only through Secrets Manager. API schemas validate inputs, prompt-bound
 screened for instruction override attempts, and audit logs mask common email/card PII.
 Every request should carry a correlation ID for audit and incident investigation.
 
+## JWT signing material
+
+The dev API Lambda receives `JWT_SECRET_SECRET_ARN` and resolves the signing material from its
+dedicated KMS-encrypted Secrets Manager secret. `JWT_SECRET` remains a local-development-only
+environment variable and is never configured on the deployed Lambda.
+
 ## Security dashboard
 
 The monitoring module provisions a CloudWatch security dashboard for Lambda errors and

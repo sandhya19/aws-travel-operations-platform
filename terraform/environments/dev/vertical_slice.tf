@@ -37,6 +37,16 @@ module "cockroach_root_cert" {
   tags                    = local.tags
 }
 
+module "jwt_secret" {
+  source                  = "../../modules/secrets_manager"
+  name                    = "${local.name}/jwt-secret"
+  description             = "JWT signing secret for ${local.name}"
+  kms_key_arn             = module.database_key.key_arn
+  secret_string           = var.jwt_secret
+  recovery_window_in_days = 7
+  tags                    = local.tags
+}
+
 module "api_role" {
   source              = "../../modules/iam"
   name                = "${local.name}-api"
@@ -44,7 +54,7 @@ module "api_role" {
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
   inline_policies = {
     events   = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["events:PutEvents"], Resource = "arn:aws:events:${var.aws_region}:*:event-bus/${local.name}-travel" }] })
-    database = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["secretsmanager:GetSecretValue"], Resource = [module.database_secret.secret_arn, module.cockroach_root_cert.secret_arn] }] })
+    database = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["secretsmanager:GetSecretValue"], Resource = [module.database_secret.secret_arn, module.cockroach_root_cert.secret_arn, module.jwt_secret.secret_arn] }] })
     decrypt  = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["kms:Decrypt"], Resource = module.database_key.key_arn }] })
     workflow = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["states:SendTaskSuccess"], Resource = "*" }] })
   }
@@ -121,7 +131,7 @@ module "api_lambda" {
     EVENT_BUS_NAME                 = "${local.name}-travel"
     DATABASE_URL_SECRET_ARN        = module.database_secret.secret_arn
     COCKROACH_ROOT_CERT_SECRET_ARN = module.cockroach_root_cert.secret_arn
-    JWT_SECRET                     = var.jwt_secret
+    JWT_SECRET_SECRET_ARN          = module.jwt_secret.secret_arn
   }
   tags = local.tags
 }

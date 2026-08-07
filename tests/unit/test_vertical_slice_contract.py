@@ -27,6 +27,17 @@ def test_lambdas_read_database_url_from_the_kms_encrypted_secret() -> None:
     assert definition.count('Action = ["kms:Decrypt"]') >= 2
 
 
+def test_api_reads_jwt_from_a_dedicated_runtime_secret() -> None:
+    definition = (
+        Path(__file__).parents[2] / "terraform" / "environments" / "dev" / "vertical_slice.tf"
+    ).read_text(encoding="utf-8")
+
+    assert 'name                    = "${local.name}/jwt-secret"' in definition
+    assert 'JWT_SECRET_SECRET_ARN          = module.jwt_secret.secret_arn' in definition
+    assert "JWT_SECRET                     = var.jwt_secret" not in definition
+    assert "module.jwt_secret.secret_arn" in definition
+
+
 def test_outbox_dispatcher_can_route_exhausted_events_to_the_dlq() -> None:
     """The dispatcher needs an explicit DLQ URL and narrowly scoped send permission."""
     definition = (

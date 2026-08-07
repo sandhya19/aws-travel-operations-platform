@@ -2,7 +2,9 @@
 
 import os
 from dataclasses import dataclass
+from functools import lru_cache
 
+import boto3
 import jwt
 from fastapi import Depends, HTTPException, Request, status
 
@@ -13,6 +15,17 @@ class AuthenticatedUser:
     roles: frozenset[str]
 
 
+@lru_cache
+def load_jwt_secret() -> str:
+    """Resolve the local secret or Lambda runtime Secrets Manager reference."""
+    if secret := os.getenv("JWT_SECRET"):
+        return secret
+    if secret_arn := os.getenv("JWT_SECRET_SECRET_ARN"):
+        response = boto3.client("secretsmanager").get_secret_value(SecretId=secret_arn)
+        return str(response["SecretString"])
+    raise KeyError("JWT_SECRET")
+
+
 def require_user(request: Request) -> AuthenticatedUser:
     authorization = request.headers.get("Authorization", "")
     if not authorization.startswith("Bearer "):
@@ -21,7 +34,7 @@ def require_user(request: Request) -> AuthenticatedUser:
         )
     try:
         claims = jwt.decode(
-            authorization.removeprefix("Bearer "), os.environ["JWT_SECRET"], algorithms=["HS256"]
+            authorization.removeprefix("Bearer "), load_jwt_secret(), algorithms=["HS256"]
         )
         roles = claims.get("roles", [])
         if not isinstance(roles, list) or not all(isinstance(role, str) for role in roles):
@@ -33,7 +46,9 @@ def require_user(request: Request) -> AuthenticatedUser:
         ) from error
 
 
-def require_approver(user: AuthenticatedUser = Depends(require_user)) -> AuthenticatedUser:
+def require_approver(
+    user: AuthenticatedUser = Depends(require_user),  # noqa: B008
+) -> AuthenticatedUser:
     """Require the explicit role permitted to resolve human approvals."""
     if "travel:approve" not in user.roles:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Approver role required")

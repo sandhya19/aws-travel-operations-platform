@@ -28,8 +28,9 @@ dispatchers skip locked events. The retry and DLQ Terraform contracts, unit test
 AWS recovery exercise pass: a failed event was requeued, republished, and started its
 idempotent Step Functions execution.
 
-The API Lambda receives `JWT_SECRET` from a sensitive development Terraform variable. This
-enables authenticated API calls; migrate it to Secrets Manager before production use.
+IMP-005 moves the API JWT signing secret to a dedicated KMS-encrypted Secrets Manager entry.
+The Lambda receives only its ARN and resolves the value at runtime; local development retains
+the ignored `JWT_SECRET` environment variable.
 
 ## Current milestone
 
