@@ -92,6 +92,7 @@ module "outbox_dispatcher_role" {
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"]
   inline_policies = {
     events   = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["events:PutEvents"], Resource = module.events.event_bus_arn }] })
+    dlq      = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["sqs:SendMessage"], Resource = module.workflow_dlq.dlq_arn }] })
     database = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["secretsmanager:GetSecretValue"], Resource = [module.database_secret.secret_arn, module.cockroach_root_cert.secret_arn] }] })
     decrypt  = jsonencode({ Version = "2012-10-17", Statement = [{ Effect = "Allow", Action = ["kms:Decrypt"], Resource = module.database_key.key_arn }] })
   }
@@ -166,6 +167,8 @@ module "outbox_dispatcher_lambda" {
     DATABASE_URL_SECRET_ARN        = module.database_secret.secret_arn
     COCKROACH_ROOT_CERT_SECRET_ARN = module.cockroach_root_cert.secret_arn
     EVENT_BUS_NAME                 = module.events.event_bus_name
+    OUTBOX_DLQ_URL                 = module.workflow_dlq.dlq_url
+    OUTBOX_MAX_ATTEMPTS            = "3"
   }
   tags = local.tags
 }

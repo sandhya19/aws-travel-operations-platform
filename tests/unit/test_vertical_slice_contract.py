@@ -25,3 +25,15 @@ def test_lambdas_read_database_url_from_the_kms_encrypted_secret() -> None:
     assert re.search(r"DATABASE_URL_SECRET_ARN\s+= module\.database_secret\.secret_arn", definition)
     assert definition.count('Action = ["secretsmanager:GetSecretValue"]') >= 2
     assert definition.count('Action = ["kms:Decrypt"]') >= 2
+
+
+def test_outbox_dispatcher_can_route_exhausted_events_to_the_dlq() -> None:
+    """The dispatcher needs an explicit DLQ URL and narrowly scoped send permission."""
+    definition = (
+        Path(__file__).parents[2] / "terraform" / "environments" / "dev" / "vertical_slice.tf"
+    ).read_text(encoding="utf-8")
+
+    assert 'Action = ["sqs:SendMessage"]' in definition
+    assert 'Resource = module.workflow_dlq.dlq_arn' in definition
+    assert 'OUTBOX_DLQ_URL                 = module.workflow_dlq.dlq_url' in definition
+    assert 'OUTBOX_MAX_ATTEMPTS            = "3"' in definition

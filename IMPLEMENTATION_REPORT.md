@@ -16,6 +16,8 @@ workflow-start behavior required by IMP-012.
 - Start workflows through a Lambda adapter using the outbox event ID as the execution name.
 - Treat an existing Standard Step Functions execution for the same outbox event as a
   successful duplicate delivery.
+- Bound outbox publication to three attempts and route exhausted events to the encrypted
+  SQS DLQ using only recovery identifiers and failure context.
 - Require the `travel:approve` role for approval requests.
 
 ## Files modified
@@ -42,6 +44,7 @@ workflow-start behavior required by IMP-012.
 - Added runtime secret ARNs and least-privilege `GetSecretValue`/`kms:Decrypt` permissions
   to the API, workflow, and outbox Lambdas.
 - Added the outbox dispatcher and workflow starter Lambdas.
+- Added the dispatcher DLQ URL and narrowly scoped `sqs:SendMessage` permission.
 - Routed custom-bus travel events to the workflow starter and scheduled the dispatcher on
   the default EventBridge bus every minute.
 - Added Lambda permissions for both EventBridge invocations and Step Functions failure
@@ -71,6 +74,7 @@ workflow-start behavior required by IMP-012.
 - Workflow definition and KMS/Secrets Terraform contracts.
 - Workflow-starter execution-name and duplicate-delivery contracts.
 - Outbox-dispatcher success and retry contracts.
+- Exhausted outbox-retry DLQ routing and Terraform/IAM environment contracts.
 - Migration lineage contracts for revisions through `0006`.
 
 ## Test coverage
@@ -113,10 +117,10 @@ dispatcher invocation. No budget alarm or measured cost model exists.
 
 ## Known limitations
 
-- The outbox dispatcher has retry metadata but no backoff policy or alert threshold.
-- Duplicate workflow starts are unit-tested but have not been exercised with a real
-  duplicate EventBridge delivery in AWS. An attempted AWS CLI exercise did not publish
-  an event because PowerShell altered the JSON argument before it reached the CLI.
+- The outbox dispatcher uses bounded attempts but has no time-based backoff or alert threshold.
+- Duplicate workflow starts and exhausted retry/DLQ routing are unit-tested but have not
+  been exercised with a real EventBridge/SQS delivery in AWS. The current AWS SSO session
+  must be refreshed before that evidence can be captured.
 - Approval callback delivery is not a distributed transaction with Step Functions.
 - The project has no automated, recorded cloud E2E test, DLQ exercise, or recovery drill.
 - Terraform state is local; remote state and CI promotion controls are absent.

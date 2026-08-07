@@ -1,6 +1,6 @@
 # Session state
 
-**Last updated:** 2026-08-05
+**Last updated:** 2026-08-07
 
 ## Completed
 
@@ -22,14 +22,20 @@ and API approval endpoint. The deployed OpenAPI endpoint returned HTTP 200.
 The callback state now stores its result under `$.approval`, preserving the original
 EventBridge detail for the completion task.
 
+IMP-012 now bounds outbox publication attempts. After three failures, the event is marked
+`FAILED` and a minimal recovery message is written to the encrypted SQS DLQ. The retry and
+DLQ Terraform contracts and unit tests pass; the deployed AWS recovery exercise remains open.
+
 The API Lambda receives `JWT_SECRET` from a sensitive development Terraform variable. This
 enables authenticated API calls; migrate it to Secrets Manager before production use.
 
 ## Current milestone
 
-IMP-003 is complete. Do not start the next improvement without an explicit request.
+IMP-012 is in progress. Repository-side bounded retry/DLQ support is complete; AWS delivery
+and recovery evidence remains required before it can be marked complete.
 
 ## Next authorized work
 
-Next recommended improvement: introduce a transactional outbox and role-based approval
-authorization so database state and workflow delivery are atomic and approvals are segregated.
+Refresh the AWS SSO session, apply the changed development Terraform, and exercise failed
+publication through DLQ recovery. Then complete IMP-003's authenticated cloud E2E/demo
+evidence before starting the next implementation milestone.

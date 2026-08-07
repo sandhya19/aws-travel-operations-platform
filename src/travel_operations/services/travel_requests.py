@@ -49,8 +49,8 @@ class TravelRequestService:
     def pending_outbox_events(self) -> list[WorkflowOutboxEventModel]:
         return self._repository.pending_outbox_events()
 
-    def record_outbox_failure(self, event_id: UUID, error: str) -> None:
-        self._repository.record_outbox_failure(event_id, error)
+    def record_outbox_failure(self, event_id: UUID, error: str, max_attempts: int) -> bool:
+        return self._repository.record_outbox_failure(event_id, error, max_attempts)
 
     def commit(self) -> None:
         """Commit the durable state before making an external AWS call."""

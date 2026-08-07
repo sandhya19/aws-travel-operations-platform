@@ -76,11 +76,15 @@ class TravelRequestRepository:
             )
         )
 
-    def record_outbox_failure(self, event_id: UUID, error: str) -> None:
+    def record_outbox_failure(self, event_id: UUID, error: str, max_attempts: int) -> bool:
         event = self._session.get(WorkflowOutboxEventModel, event_id)
         if event is not None:
             event.attempts += 1
             event.last_error = error[:1000]
+            if event.attempts >= max_attempts:
+                event.status = "FAILED"
+                return True
+        return False
 
     def commit(self) -> None:
         self._session.commit()

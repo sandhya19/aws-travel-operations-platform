@@ -19,10 +19,11 @@ class FakeSession:
 
 
 class FakeService:
-    def __init__(self, event: object) -> None:
+    def __init__(self, event: object, exhausted: bool = False) -> None:
         self._event = event
+        self._exhausted = exhausted
         self.published: list[object] = []
-        self.failures: list[tuple[object, str]] = []
+        self.failures: list[tuple[object, str, int]] = []
 
     def pending_outbox_events(self) -> list[object]:
         return [self._event]
@@ -30,8 +31,9 @@ class FakeService:
     def mark_outbox_event_published(self, event_id: object) -> None:
         self.published.append(event_id)
 
-    def record_outbox_failure(self, event_id: object, error: str) -> None:
-        self.failures.append((event_id, error))
+    def record_outbox_failure(self, event_id: object, error: str, max_attempts: int) -> bool:
+        self.failures.append((event_id, error, max_attempts))
+        return self._exhausted
 
 
 def test_dispatcher_marks_successful_event_published(monkeypatch: object) -> None:
@@ -45,7 +47,7 @@ def test_dispatcher_marks_successful_event_published(monkeypatch: object) -> Non
     monkeypatch.setattr(outbox_dispatcher, "TravelRequestService", lambda _: service)
     monkeypatch.setattr(outbox_dispatcher, "publish_travel_request_created", lambda *_: None)
 
-    assert outbox_dispatcher.handler({}, object()) == {"published": 1, "failed": 0}
+    assert outbox_dispatcher.handler({}, object()) == {"published": 1, "failed": 0, "dlq": 0}
     assert service.published == [event.id]
 
 
@@ -64,5 +66,27 @@ def test_dispatcher_leaves_failed_event_pending_for_retry(monkeypatch: object) -
         lambda *_: (_ for _ in ()).throw(RuntimeError("EventBridge unavailable")),
     )
 
-    assert outbox_dispatcher.handler({}, object()) == {"published": 0, "failed": 1}
-    assert service.failures == [(event.id, "EventBridge unavailable")]
+    assert outbox_dispatcher.handler({}, object()) == {"published": 0, "failed": 1, "dlq": 0}
+    assert service.failures == [(event.id, "EventBridge unavailable", 3)]
+
+
+def test_dispatcher_routes_exhausted_event_to_dlq(monkeypatch: object) -> None:
+    event = SimpleNamespace(
+        id=uuid4(),
+        travel_request_id=uuid4(),
+        event_type="TravelRequestCreated",
+        payload=json.dumps({"requester_id": "employee"}),
+    )
+    service = FakeService(event, exhausted=True)
+    monkeypatch.setattr(outbox_dispatcher, "SessionFactory", lambda: FakeSession())
+    monkeypatch.setattr(outbox_dispatcher, "TravelRequestService", lambda _: service)
+    monkeypatch.setattr(
+        outbox_dispatcher,
+        "publish_travel_request_created",
+        lambda *_: (_ for _ in ()).throw(RuntimeError("EventBridge unavailable")),
+    )
+    dlq = []
+    monkeypatch.setattr(outbox_dispatcher, "send_to_dlq", lambda *args: dlq.append(args))
+
+    assert outbox_dispatcher.handler({}, object()) == {"published": 0, "failed": 1, "dlq": 1}
+    assert dlq == [(event, "EventBridge unavailable")]
