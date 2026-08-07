@@ -11,7 +11,7 @@ from travel_operations.repositories.travel_requests import TravelRequestReposito
 from travel_operations.services.travel_requests import TravelRequestService
 
 
-def send_to_dlq(event: object, error: str) -> None:
+def send_to_dlq(event: object, error: Exception) -> None:
     """Send only recovery identifiers and failure context to the configured DLQ."""
     queue_url = os.environ["OUTBOX_DLQ_URL"]
     boto3.client("sqs").send_message(
@@ -20,7 +20,7 @@ def send_to_dlq(event: object, error: str) -> None:
             {
                 "event_id": str(event.id),
                 "event_type": event.event_type,
-                "error": error,
+                "error_type": type(error).__name__,
             }
         ),
     )
@@ -44,7 +44,7 @@ def handler(_: dict[str, object], __: object) -> dict[str, int]:
                 )
             except Exception as error:
                 if service.record_outbox_failure(event.id, str(error), max_attempts):
-                    send_to_dlq(event, str(error))
+                    send_to_dlq(event, error)
                     dlq += 1
                 failed += 1
             else:

@@ -7,9 +7,10 @@ The intended lifecycle is:
    and an SQS dead-letter queue.
 3. If direct publication fails, the durable outbox record remains pending for the scheduled
    dispatcher. After three failed attempts it is marked `FAILED` and the dispatcher sends a
-   recovery message containing only the outbox event ID, event type, and error to the SQS DLQ.
-   Recovery operators use the event ID to inspect or requeue the durable CockroachDB record;
-   workflow-start idempotency makes a repeated delivery safe.
+   recovery message containing only the outbox event ID, event type, and error type to the SQS
+   DLQ. The dispatcher locks selected pending records and skips records already being handled by
+   another invocation. Recovery operators use the event ID to inspect or requeue the durable
+   CockroachDB record; workflow-start idempotency makes a repeated delivery safe.
 4. The workflow Lambda validates the event then records the callback task token in
    CockroachDB's `approval_tasks` table.
 5. An authenticated caller posts an approval decision; the API resolves the Step Functions
@@ -20,7 +21,19 @@ This vertical slice intentionally stops at human approval. Policy, visa, risk, i
 recommendation, and AI event contracts remain outside IMP-003.
 
 The AWS DLQ handoff is unit- and Terraform-contract-tested. Its deployed recovery exercise
-remains required evidence for IMP-012 completion.
+has verified bounded failure, one sanitized DLQ message, requeue, republish, and an idempotent
+Step Functions start.
+
+## Recovery
+
+After investigating a DLQ message, requeue only its matching `FAILED` CockroachDB event:
+
+```bash
+python scripts/requeue_outbox_event.py <event-id>
+```
+
+The scheduled dispatcher republishes the event. The workflow starter uses the outbox event ID
+as the Step Functions execution name, so a repeated delivery remains idempotent.
 
 ## Workflow
 

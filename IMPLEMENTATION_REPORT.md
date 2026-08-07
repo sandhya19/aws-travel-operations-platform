@@ -18,6 +18,7 @@ workflow-start behavior required by IMP-012.
   successful duplicate delivery.
 - Bound outbox publication to three attempts and route exhausted events to the encrypted
   SQS DLQ using only recovery identifiers and failure context.
+- Lock selected outbox rows so concurrent dispatchers do not process an event simultaneously.
 - Require the `travel:approve` role for approval requests.
 
 ## Files modified
@@ -75,15 +76,19 @@ workflow-start behavior required by IMP-012.
 - Workflow-starter execution-name and duplicate-delivery contracts.
 - Outbox-dispatcher success and retry contracts.
 - Exhausted outbox-retry DLQ routing and Terraform/IAM environment contracts.
+- Failed-event requeue command contracts.
 - Migration lineage contracts for revisions through `0006`.
 
 ## Test coverage
 
 - Targeted IMP-002 tests passed: 5 tests.
-- Earlier full Python execution passed: 20 tests.
+- Full Python execution passed: 31 tests.
 - Terraform initialization, formatting checks for modified files, validation, planning, and
   multiple dev applies passed.
 - The submit-to-approval path was manually completed in the deployed dev environment.
+- A controlled AWS exercise verified a failed outbox event reached `FAILED` after three attempts,
+  emitted one sanitized SQS DLQ message, was requeued with `scripts/requeue_outbox_event.py`,
+  republished, and started its deterministic Step Functions execution.
 
 This report does **not** claim that all required quality or production tests passed.
 The complete suite was not rerun after every final packaging/deployment change. Ruff,
@@ -118,9 +123,8 @@ dispatcher invocation. No budget alarm or measured cost model exists.
 ## Known limitations
 
 - The outbox dispatcher uses bounded attempts but has no time-based backoff or alert threshold.
-- Duplicate workflow starts and exhausted retry/DLQ routing are unit-tested but have not
-  been exercised with a real EventBridge/SQS delivery in AWS. The current AWS SSO session
-  must be refreshed before that evidence can be captured.
+- Duplicate workflow starts are unit-tested. The exhausted retry/DLQ recovery path has been
+  exercised in AWS, but automated cloud E2E coverage remains absent.
 - Approval callback delivery is not a distributed transaction with Step Functions.
 - The project has no automated, recorded cloud E2E test, DLQ exercise, or recovery drill.
 - Terraform state is local; remote state and CI promotion controls are absent.
@@ -128,8 +132,7 @@ dispatcher invocation. No budget alarm or measured cost model exists.
 
 ## Remaining work
 
-1. Add automated cloud E2E coverage for submission, approval, completion, retries, and
-   DLQ behavior.
+1. Add automated cloud E2E coverage for submission, approval, and completion.
 2. Add CockroachDB migration and repository integration tests against an isolated database.
 3. Make Ruff, Black, MyPy, security scanning, and coverage required CI gates.
 4. Add operational alerts for outbox failures, DLQ growth, Lambda errors, and approval delay.

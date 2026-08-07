@@ -73,6 +73,7 @@ class TravelRequestRepository:
                 .where(WorkflowOutboxEventModel.status == "PENDING")
                 .order_by(WorkflowOutboxEventModel.created_at)
                 .limit(limit)
+                .with_for_update(skip_locked=True)
             )
         )
 

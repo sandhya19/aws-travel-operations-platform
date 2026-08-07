@@ -23,19 +23,20 @@ The callback state now stores its result under `$.approval`, preserving the orig
 EventBridge detail for the completion task.
 
 IMP-012 now bounds outbox publication attempts. After three failures, the event is marked
-`FAILED` and a minimal recovery message is written to the encrypted SQS DLQ. The retry and
-DLQ Terraform contracts and unit tests pass; the deployed AWS recovery exercise remains open.
+`FAILED` and a minimal recovery message is written to the encrypted SQS DLQ. Concurrent
+dispatchers skip locked events. The retry and DLQ Terraform contracts, unit tests, and deployed
+AWS recovery exercise pass: a failed event was requeued, republished, and started its
+idempotent Step Functions execution.
 
 The API Lambda receives `JWT_SECRET` from a sensitive development Terraform variable. This
 enables authenticated API calls; migrate it to Secrets Manager before production use.
 
 ## Current milestone
 
-IMP-012 is in progress. Repository-side bounded retry/DLQ support is complete; AWS delivery
-and recovery evidence remains required before it can be marked complete.
+IMP-012 is complete. The next incomplete priority is IMP-003's authenticated cloud E2E and
+scripted demo evidence.
 
 ## Next authorized work
 
-Refresh the AWS SSO session, apply the changed development Terraform, and exercise failed
-publication through DLQ recovery. Then complete IMP-003's authenticated cloud E2E/demo
-evidence before starting the next implementation milestone.
+Complete IMP-003's authenticated cloud E2E/demo evidence before starting the next
+implementation milestone.

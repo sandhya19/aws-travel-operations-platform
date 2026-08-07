@@ -89,4 +89,24 @@ def test_dispatcher_routes_exhausted_event_to_dlq(monkeypatch: object) -> None:
     monkeypatch.setattr(outbox_dispatcher, "send_to_dlq", lambda *args: dlq.append(args))
 
     assert outbox_dispatcher.handler({}, object()) == {"published": 0, "failed": 1, "dlq": 1}
-    assert dlq == [(event, "EventBridge unavailable")]
+    assert len(dlq) == 1
+    assert dlq[0][0] == event
+    assert isinstance(dlq[0][1], RuntimeError)
+
+
+def test_dlq_message_uses_error_type_without_raw_failure_details(monkeypatch: object) -> None:
+    event = SimpleNamespace(id=uuid4(), event_type="TravelRequestCreated")
+    message: dict[str, object] = {}
+    monkeypatch.setenv("OUTBOX_DLQ_URL", "https://sqs.example.test/dlq")
+    client = SimpleNamespace(
+        send_message=lambda **kwargs: message.update(kwargs),
+    )
+    monkeypatch.setattr(outbox_dispatcher.boto3, "client", lambda _: client)
+
+    outbox_dispatcher.send_to_dlq(event, RuntimeError("contains an internal ARN"))
+
+    assert json.loads(str(message["MessageBody"])) == {
+        "event_id": str(event.id),
+        "event_type": "TravelRequestCreated",
+        "error_type": "RuntimeError",
+    }
