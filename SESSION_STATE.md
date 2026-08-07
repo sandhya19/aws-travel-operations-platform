@@ -33,10 +33,12 @@ enables authenticated API calls; migrate it to Secrets Manager before production
 
 ## Current milestone
 
-IMP-012 is complete. The next incomplete priority is IMP-003's authenticated cloud E2E and
-scripted demo evidence.
+IMP-012 is complete. IMP-003's deployed recovery path was exercised through an authorized
+approval: the API returned HTTP 202, CockroachDB recorded `APPROVED` and `COMPLETED`, and the
+idempotent Step Functions execution succeeded. A scripted authenticated request-submission
+test and demo evidence remain open.
 
 ## Next authorized work
 
-Complete IMP-003's authenticated cloud E2E/demo evidence before starting the next
-implementation milestone.
+Add the scripted authenticated request-submission test and demo evidence for IMP-003 before
+starting the next implementation milestone.

@@ -89,6 +89,8 @@ workflow-start behavior required by IMP-012.
 - A controlled AWS exercise verified a failed outbox event reached `FAILED` after three attempts,
   emitted one sanitized SQS DLQ message, was requeued with `scripts/requeue_outbox_event.py`,
   republished, and started its deterministic Step Functions execution.
+- The recovered workflow was approved through the authenticated API (HTTP 202); CockroachDB
+  recorded `APPROVED` and `COMPLETED`, and the matching Step Functions execution succeeded.
 
 This report does **not** claim that all required quality or production tests passed.
 The complete suite was not rerun after every final packaging/deployment change. Ruff,
@@ -132,7 +134,8 @@ dispatcher invocation. No budget alarm or measured cost model exists.
 
 ## Remaining work
 
-1. Add automated cloud E2E coverage for submission, approval, and completion.
+1. Add scripted or automated cloud E2E coverage for authenticated submission, approval, and
+   completion.
 2. Add CockroachDB migration and repository integration tests against an isolated database.
 3. Make Ruff, Black, MyPy, security scanning, and coverage required CI gates.
 4. Add operational alerts for outbox failures, DLQ growth, Lambda errors, and approval delay.
