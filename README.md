@@ -5,7 +5,10 @@
 [![Python](https://img.shields.io/badge/python-3.12-3776AB)](pyproject.toml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-An interview-ready reference platform for human-governed, AI-assisted corporate travel operations. It demonstrates serverless APIs, event-driven workflows, CockroachDB persistence, RAG foundations, security controls, evaluation, and production-oriented infrastructure.
+An interactive, human-governed travel-operations platform. It demonstrates a customer itinerary
+draft journey, centralized specialist orchestration, CockroachDB durable agent provenance,
+event-driven human approval, RAG foundations, security controls, evaluation, and
+production-oriented infrastructure.
 
 > AI recommends. Humans approve. Every material recommendation is intended to be explainable and source-grounded.
 
@@ -14,6 +17,8 @@ An interview-ready reference platform for human-governed, AI-assisted corporate 
 - Clear domain boundaries: API, workflow, knowledge, policy/risk/insurance, and approval
 - Production practices: Terraform, least privilege, KMS/Secrets, audit logs, CI/CD
 - Explainable AI foundations: citations, prompt versions, grounding checks, evaluations
+- Interactive itinerary draft: one request delegates profile, policy, risk, inventory, itinerary,
+  and financial specialists; every result is durable, reviewable, and non-booking
 - Practical interview discussion: trade-offs, ADRs, diagrams, runbooks, and tests
 
 ## Architecture
@@ -56,6 +61,8 @@ Run the reproducible deployed demonstration with `scripts/run_dev_workflow_demo.
 - [Developer guide](docs/guides/development.md)
 - [Troubleshooting](docs/guides/troubleshooting.md)
 - [Demo data](docs/demo-data.md)
+- [Operational evidence and SLOs](docs/operations.md)
+- [Recovery and DR runbooks](docs/runbooks/README.md)
 
 ## Project structure
 

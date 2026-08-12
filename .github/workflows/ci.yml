@@ -1,8 +1,9 @@
 name: Continuous Integration
 
-# Push and pull-request triggers are intentionally disabled until the
-# quality pipeline is ready. Run this workflow manually from GitHub Actions.
 on:
+  push:
+    branches: [main, master]
+  pull_request:
   workflow_dispatch:
 
 permissions:

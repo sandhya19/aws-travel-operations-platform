@@ -41,3 +41,8 @@ Thumbs.db
 
 # Deployment artifacts
 dist/
+*.zip.tmp
+.agentcore-build/
+agentcore-payload.json
+agentcore-response.json
+travel-operations-evidence/

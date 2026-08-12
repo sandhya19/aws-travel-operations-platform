@@ -17,6 +17,59 @@ All notable changes are generated automatically from Conventional Commits by sem
 
 ### Added
 
+- Added the authenticated `POST /itineraries` interactive journey. It creates one travel case,
+  delegates six bounded specialists through a centralized coordinator, returns a transparent
+  non-booking draft, and stores its complete CockroachDB provenance before human approval.
+
+- Added a bounded AgentCore itinerary coordinator that delegates durable policy/compliance, risk,
+  and itinerary-draft specialist tool calls, returning a non-booking, human-review draft.
+
+- Added Milestone 4 operational evidence tooling: bounded concurrent workflow benchmarks and KPI
+  comparison, checkpoint fault/recovery procedures, Terraform-managed CloudWatch/SNS alarms and
+  operations dashboard, plus CockroachDB restore-drill evidence validation and runbooks.
+
+- Completed IMP-019 test automation foundation: push/pull-request CI triggers, an opt-in deployed
+  authenticated request-to-approval E2E test, reusable workflow-runner evidence, and documented
+  database/cloud test tiers.
+
+- Completed IMP-018 reproducible prompt-release benchmark: version-linked golden dataset coverage,
+  deterministic insufficient-evidence evaluation, aggregate groundedness/citation quality gates,
+  reviewed v2 baseline, and a non-zero failing release command.
+
+- Completed IMP-017 prompt release governance with versioned active/rollback metadata, owner/model
+  assumptions, linked evaluation gates, prompt-injection-hardened grounded-answer v2, and release
+  registry tests.
+
+- Completed IMP-016 grounded-answer safety controls: deterministic confidence threshold,
+  insufficient-evidence and safe-fallback outcomes, adversarial failure coverage, and a baseline
+  Terraform-managed Bedrock Guardrail for the future model-invocation boundary.
+
+- Completed IMP-015 with an AgentCore Runtime direct-code coordinator, typed Lambda tool, narrowly
+  scoped invocation permissions, and durable CockroachDB tool provenance. This replaces the
+  unavailable Bedrock Agent/action-group resource for accounts in Bedrock Agents maintenance mode.
+
+- Completed IMP-014 citation RAG foundation with CockroachDB tenant/role query filters, versioned
+  citations, grounded-answer validation, and citation regression coverage.
+
+- Completed IMP-013 secure document ingestion with tenant-prefixed PDF validation, immutable
+  CockroachDB document versions, Titan embedding validation, and scoped S3/Lambda/IAM resources.
+
+- Completed IMP-011 tenant-aware memory retrieval. Travel requests are now tenant-owned and
+  tenant-scoped request, memory, approval, approval-history, and action-group provenance queries
+  deny cross-tenant access.
+
+- Started IMP-006 with CockroachDB-backed, tenant-scoped travel-case sessions and append-only
+  memory events. The authenticated request owner can retrieve the recorded case history.
+
+- Started IMP-007 with durable deterministic workflow plans and idempotent action-group tool
+  execution provenance, correlated to each travel case.
+
+- Started IMP-008 with idempotent CockroachDB checkpoints for the travel approval workflow.
+
+- Started IMP-009 with immutable rejection decisions, approval history, and workflow branching.
+
+- Started IMP-010 with scheduled expiry of terminal travel-case memory and immutable lifecycle evidence.
+
 - Moved the dev API JWT signing secret from Lambda environment configuration to a dedicated
   KMS-encrypted Secrets Manager runtime secret.
 

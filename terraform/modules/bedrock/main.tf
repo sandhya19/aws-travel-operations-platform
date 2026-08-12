@@ -4,4 +4,12 @@ resource "aws_bedrock_guardrail" "this" {
   blocked_outputs_messaging = var.blocked_outputs_messaging
   description               = var.description
   tags                      = var.tags
+
+  content_policy_config {
+    filters_config {
+      type            = "PROMPT_ATTACK"
+      input_strength  = "HIGH"
+      output_strength = "NONE"
+    }
+  }
 }

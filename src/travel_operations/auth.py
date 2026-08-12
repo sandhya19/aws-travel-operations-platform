@@ -13,6 +13,7 @@ from fastapi import Depends, HTTPException, Request, status
 class AuthenticatedUser:
     subject: str
     roles: frozenset[str]
+    tenant_id: str = "default"
 
 
 @lru_cache
@@ -39,7 +40,12 @@ def require_user(request: Request) -> AuthenticatedUser:
         roles = claims.get("roles", [])
         if not isinstance(roles, list) or not all(isinstance(role, str) for role in roles):
             raise KeyError("roles")
-        return AuthenticatedUser(subject=str(claims["sub"]), roles=frozenset(roles))
+        tenant_id = claims.get("tenant_id", "default")
+        if not isinstance(tenant_id, str) or not tenant_id:
+            raise KeyError("tenant_id")
+        return AuthenticatedUser(
+            subject=str(claims["sub"]), roles=frozenset(roles), tenant_id=tenant_id
+        )
     except (KeyError, jwt.InvalidTokenError) as error:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid access token"

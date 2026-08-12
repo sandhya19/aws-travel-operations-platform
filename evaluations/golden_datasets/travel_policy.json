@@ -1,1 +1,16 @@
-[{"id":"policy-001","question":"Is business class allowed?","context":"Business class requires executive approval.","expected_citations":["policy:12"],"reference_answer":"Business class requires executive approval [policy:12]."}]
+[
+  {
+    "id": "policy-001",
+    "question": "Is business class allowed?",
+    "context": "Business class requires executive approval.",
+    "expected_citations": ["policy:12"],
+    "reference_answer": "Business class requires executive approval [policy:12]."
+  },
+  {
+    "id": "policy-002-insufficient-evidence",
+    "question": "Can I book a private charter?",
+    "context": "",
+    "expected_citations": [],
+    "reference_answer": "Insufficient approved evidence to answer."
+  }
+]

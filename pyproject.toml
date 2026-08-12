@@ -56,3 +56,7 @@ mypy_path = "src"
 addopts = "-ra --strict-markers"
 testpaths = ["tests"]
 pythonpath = ["src"]
+markers = [
+  "database: requires DATABASE_URL and RUN_DATABASE_INTEGRATION=1",
+  "cloud: requires DEV_API_URL, JWT_SECRET, and RUN_CLOUD_E2E=1 against the deployed dev stack",
+]

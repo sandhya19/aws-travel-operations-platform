@@ -8,3 +8,4 @@ module "network" {
   private_subnet_cidrs = var.private_subnet_cidrs
   tags                 = local.tags
 }
+data "aws_caller_identity" "current" {}

@@ -1,0 +1,11 @@
+{
+  "Rules": [
+    {
+      "ApplyServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "aws:kms",
+        "KMSMasterKeyID": "alias/travel-operations-terraform-state"
+      },
+      "BucketKeyEnabled": true
+    }
+  ]
+}

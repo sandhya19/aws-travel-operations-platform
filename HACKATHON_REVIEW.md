@@ -2,7 +2,16 @@
 
 ## Executive Summary
 
-**Overall score: 31/100. Verdict: do not submit as a first-place contender.** The idea is relevant and the repository shows strong architectural intent, but it is a disconnected scaffold rather than a demonstrable product. Critical implementation, migration, test, deployment, and agent-memory gaps would prevent a finals run.
+> Historical baseline: this review predates the implemented IMP-001/002/003/004/012 vertical
+> slice and the IMP-006/007 memory and provenance foundations. Its findings about broken migrations, uncomposed
+> Terraform, unsafe request-session handling, absent approval history, and no deployable
+> workflow are no longer current. Its findings about incomplete agent execution, memory
+> provenance/replay, runtime RAG, CI gates, and operational evidence remain current.
+
+**Historical score: 31/100.** This baseline predates the now-demonstrable request-to-approval
+vertical slice. The current repository should be assessed against the remaining gaps: durable
+memory is only a foundation, and agent execution, RAG, replay, CI gates, and operational proof
+are still needed before it can contend for a final round.
 
 ## Detailed Rubric
 

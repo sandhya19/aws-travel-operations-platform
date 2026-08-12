@@ -19,6 +19,13 @@ def test_handler_routes_complete_action() -> None:
     complete.assert_called_once()
 
 
+def test_handler_routes_reject_action() -> None:
+    event = {"action": "REJECT", "request_id": "request"}
+    with patch.object(workflow_handlers, "reject", return_value=event) as reject:
+        assert workflow_handlers.handler(event, object()) == event
+    reject.assert_called_once()
+
+
 def test_handler_defaults_to_validation() -> None:
     event = {"detail": {"request_id": "request"}}
     with patch.object(workflow_handlers, "validate", return_value=event) as validate:

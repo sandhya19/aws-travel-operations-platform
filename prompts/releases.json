@@ -1,0 +1,28 @@
+{
+  "releases": [
+    {
+      "prompt_id": "rag_grounded_answer",
+      "version": "v1",
+      "template": "rag_grounded_answer.md",
+      "owner": "travel-operations-platform",
+      "model": "provider-agnostic-grounded-generator",
+      "evaluation_dataset": "evaluations/golden_datasets/travel_policy.json",
+      "minimum_groundedness": 0.75,
+      "minimum_citation_accuracy": 1.0,
+      "rollback_version": "v1",
+      "status": "RETIRED"
+    },
+    {
+      "prompt_id": "rag_grounded_answer",
+      "version": "v2",
+      "template": "rag_grounded_answer.v2.md",
+      "owner": "travel-operations-platform",
+      "model": "provider-agnostic-grounded-generator",
+      "evaluation_dataset": "evaluations/golden_datasets/travel_policy.json",
+      "minimum_groundedness": 0.75,
+      "minimum_citation_accuracy": 1.0,
+      "rollback_version": "v1",
+      "status": "ACTIVE"
+    }
+  ]
+}
